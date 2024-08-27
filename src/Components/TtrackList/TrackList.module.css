@@ -1,0 +1,9 @@
+.trackList li:nth-child(n+7) {
+    display: none;
+}
+
+@media screen and (min-width:720px) {
+    .trackList li:nth-child(n+7) {
+        display:block;
+    }
+}

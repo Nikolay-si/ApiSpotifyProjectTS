@@ -1,0 +1,21 @@
+.load {
+    width: 100px;
+    height: 60px;
+    
+    background-image: url(../../img/loader.png);
+    background-size:cover;
+    animation: rotate 3s infinite;
+    overflow: hidden;
+    margin: 40px auto;
+}
+
+
+@keyframes rotate {
+    0%, 100% {
+        transform: rotate(0);
+    }
+    50% {
+        transform: rotate(360deg);
+    }
+}
+
