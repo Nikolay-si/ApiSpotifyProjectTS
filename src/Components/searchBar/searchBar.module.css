@@ -1,0 +1,32 @@
+@import "../../variables.css";
+
+.searchBar {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+    gap: 15px;
+    margin: 50px auto;
+}
+.searchBar__input {
+    margin-bottom: 40px;
+    height: 30px;
+    text-align: center;
+    font-size: 18px;
+}
+.searchBar__button {
+    width: 40%;
+    height: 30px;
+    font-weight: bold;
+    align-self: center;
+    background-color: var(--buttons-color);
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0px 0px 30px var(--box-shadow-color);
+    
+}
+
+@media screen and (min-width:720px){
+    .searchBar {
+    width: 20%;
+}
+}
