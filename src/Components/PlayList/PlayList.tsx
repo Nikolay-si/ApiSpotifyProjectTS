@@ -1,6 +1,6 @@
 import React from "react";
 
-import styles from "./PlayList.module.css";
+import styles from "./PlayList.module.scss";
 
 interface Props {
   children: React.ReactElement;
@@ -11,17 +11,16 @@ interface Props {
 }
 
 export const PlayList = ({ children, name, onChange, onClick }: Props) => {
-
   return (
-    <div className={styles.wrapper}>
+    <div className={styles.playlist}>
       <input
-        className={styles.playlistName}
+        className={styles.playlist__title}
         type="text"
         value={name}
         onChange={(e) => onChange(e.target.value)}
       />
       {children}
-      <button className={styles.button} onClick={onClick}>
+      <button className={styles.playlist__button} onClick={onClick}>
         SAVE TO SPOTIFY
       </button>
     </div>
