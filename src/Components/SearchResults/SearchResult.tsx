@@ -1,5 +1,5 @@
 import React from "react";
-import styles from "./searchResult.module.css";
+import styles from "./searchResult.module.scss";
 
 interface Props {
   children: React.ReactNode;
@@ -7,8 +7,8 @@ interface Props {
 
 export const SearchResult = ({ children }: Props) => {
   return (
-    <div className={styles.wrapper}>
-      <h2 className={styles.title}>Results</h2>
+    <div className={styles.searchResult}>
+      <h2 className={styles.searchResult__title}>Results</h2>
       {children}
     </div>
   );

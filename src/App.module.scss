@@ -1,0 +1,19 @@
+
+
+
+.lay {
+  display: flex;
+  margin: 0 auto;
+  gap: 20px;
+  min-height: 800px;
+  flex-direction: column;
+}
+
+
+@media screen and (min-width:720px){
+  .lay {
+    flex-direction: row;
+    min-height: 600px;
+  }
+  
+}

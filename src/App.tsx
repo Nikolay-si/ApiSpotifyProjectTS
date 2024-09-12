@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import styles from "./App.module.css";
+import styles from "./App.module.scss";
 import { SearchBar } from "./Components/searchBar/searchBar";
 import { TrackList } from "./Components/TtrackList/TrackList";
 import { SearchResult } from "./Components/SearchResults/SearchResult";
@@ -7,7 +7,8 @@ import { PlayList } from "./Components/PlayList/PlayList";
 import { Loader } from "./Components/loader/Loader";
 import { SongsMap } from "./interface";
 import { spotifyAuth } from "./Auth";
-import bombLogo from "./img/bomb-logo.png";
+import { Header } from "./Components/header/header";
+
 import {
   fetchSpotifyTracksData,
   fetchSpotifyUserData,
@@ -19,8 +20,8 @@ const BUTTON_SYNB_AD = "+";
 
 function App() {
   const [songsMap, setSongsMap] = useState<SongsMap>({});
-  const [searchResultId, setSearchResultId] = useState<string[]>([]);
-  const [userPlayListId, setUserPlayListId] = useState<string[]>([]);
+  const [searchResultId, setSearchResultId] = useState<Set<string>>(new Set());
+  const [userPlayListId, setUserPlayListId] = useState<Set<string>>(new Set());
   const [playListName, setPlayListName] = useState("Your Playlist");
 
   const [inputValue, setInputValue] = useState("");
@@ -35,13 +36,12 @@ function App() {
   }, []);
 
   const handleAddTrack = (id: string) => {
-    if (!userPlayListId.some((playId) => playId === id)) {
-      setUserPlayListId([...userPlayListId, id]);
-      const nextSearchResultId = searchResultId.filter(
-        (playId) => id !== playId
-      );
-      setSearchResultId(nextSearchResultId);
-    }
+    setUserPlayListId((prevSet) => new Set(prevSet.add(id)));
+    setSearchResultId((prevSet) => {
+      const updatedSet = new Set(prevSet);
+      updatedSet.delete(id);
+      return updatedSet;
+    });
   };
 
   const handleNameChange = (value: string) => {
@@ -49,11 +49,12 @@ function App() {
   };
 
   const handleDelete = (id: string) => {
-    const nextPlayListId = userPlayListId.filter((playId) => playId !== id);
+    const nextPlayListId = new Set(userPlayListId);
+    nextPlayListId.delete(id);
     setUserPlayListId(nextPlayListId);
   };
   const getTrackUrisForPlaylist = (): string[] => {
-    return userPlayListId.map((id) => songsMap[id].uri);
+    return Array.from(userPlayListId).map((id) => songsMap[id].uri);
   };
   const handleTextChange = (value: string) => {
     setInputValue(value);
@@ -85,12 +86,13 @@ function App() {
       }, {} as SongsMap);
       console.log(formattedTracks);
       setSongsMap(formattedTracks);
-      const searchResponse = tracks.map((track) => track.id);
+      const trackIdList = tracks.map((track) => track.id);
       const userPlayListSet = new Set(userPlayListId);
-      const searchDisplayed = searchResponse.filter(
+      const searchDisplayed = trackIdList.filter(
         (id) => !userPlayListSet.has(id)
       );
-      setSearchResultId(searchDisplayed);
+      const searchDisplayedId = new Set(searchDisplayed);
+      setSearchResultId(searchDisplayedId);
 
       console.log(data.tracks.items);
     } catch (error) {
@@ -123,16 +125,13 @@ function App() {
       setIsLoading(false);
     }
   };
+  const handleDisplay = (setId: Set<string>) => {
+    return [...setId].map((id) => songsMap[id]);
+  };
 
   return (
     <div>
-      <header className={styles.header}>
-        <h1>
-          <span className={styles.header__logo}>Boom</span>
-          <img className={styles.header__image} src={bombLogo} alt="logo" />
-          box
-        </h1>
-      </header>
+      <Header />
       <div className={styles.main}>
         <SearchBar
           value={inputValue}
@@ -142,7 +141,7 @@ function App() {
         <div className={styles.lay}>
           <SearchResult>
             <TrackList
-              searchResult={searchResultId.map((id) => songsMap[id])}
+              trackList={handleDisplay(searchResultId)}
               onClick={handleAddTrack}
               buttonSymb={BUTTON_SYNB_AD}
             />
@@ -156,7 +155,7 @@ function App() {
               <Loader />
             ) : (
               <TrackList
-                searchResult={userPlayListId.map((id) => songsMap[id])}
+                trackList={handleDisplay(userPlayListId)}
                 onClick={handleDelete}
                 buttonSymb={BUTTOM_SYNB_DEL}
               />
