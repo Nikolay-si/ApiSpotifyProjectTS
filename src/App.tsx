@@ -8,6 +8,7 @@ import { Loader } from "./Components/loader/Loader";
 import { SongsMap } from "./interface";
 import { spotifyAuth } from "./Auth";
 import { Header } from "./Components/header/header";
+import { useNavigate, useLocation } from "react-router-dom";
 
 import {
   fetchSpotifyTracksData,
@@ -23,10 +24,28 @@ function App() {
   const [searchResultId, setSearchResultId] = useState<Set<string>>(new Set());
   const [userPlayListId, setUserPlayListId] = useState<Set<string>>(new Set());
   const [playListName, setPlayListName] = useState("Your Playlist");
-
   const [inputValue, setInputValue] = useState("");
-
   const [isLoading, setIsLoading] = useState(false);
+  const navigation = useNavigate();
+  const searchParams = new URLSearchParams(window.location.search);
+  const location = useLocation();
+  useEffect(() => {
+    console.log("Current pathname:", location.pathname);
+    const query = searchParams.get("query");
+    if (location.pathname === "/" && query === null) {
+      setSongsMap({});
+      setUserPlayListId(new Set());
+      setInputValue("");
+    }
+  }, [location]);
+  useEffect(() => {
+    const query = searchParams.get("query");
+    if (query && query !== inputValue) {
+      setInputValue(query);
+      trackSearch(query);
+    }
+  }, [location.search]);
+
   useEffect(() => {
     const token = spotifyAuth.getAccessToken();
 
@@ -36,7 +55,7 @@ function App() {
   }, []);
 
   const handleAddTrack = (id: string) => {
-    setUserPlayListId((prevSet) => new Set(prevSet.add(id)));
+    setUserPlayListId((prevSet) => new Set([...prevSet, id]));
     setSearchResultId((prevSet) => {
       const updatedSet = new Set(prevSet);
       updatedSet.delete(id);
@@ -56,10 +75,17 @@ function App() {
   const getTrackUrisForPlaylist = (): string[] => {
     return Array.from(userPlayListId).map((id) => songsMap[id].uri);
   };
-  const handleTextChange = (value: string) => {
+  const handleQuaryChange = (value: string) => {
     setInputValue(value);
   };
-  const handleSearch = async () => {
+  const handleSearch = () => {
+    if (inputValue) {
+      searchParams.set("query", inputValue);
+      navigation(`?${searchParams}`);
+      trackSearch(inputValue);
+    }
+  };
+  const trackSearch = async (query: string) => {
     const token = spotifyAuth.getAccessToken();
     if (!token) {
       console.error("No acess token availible");
@@ -67,8 +93,7 @@ function App() {
     }
 
     try {
-      const data = await fetchSpotifyTracksData(inputValue, token);
-
+      const data = await fetchSpotifyTracksData(query, token);
       const tracks = data.tracks.items;
       const mappedTracks = tracks.map((track) => ({
         id: track.id,
@@ -85,7 +110,10 @@ function App() {
         return acc;
       }, {} as SongsMap);
       console.log(formattedTracks);
-      setSongsMap(formattedTracks);
+      setSongsMap((prevMap) => ({
+        ...prevMap,
+        ...formattedTracks,
+      }));
       const trackIdList = tracks.map((track) => track.id);
       const userPlayListSet = new Set(userPlayListId);
       const searchDisplayed = trackIdList.filter(
@@ -117,7 +145,7 @@ function App() {
         playListName,
       });
       const trackUris = getTrackUrisForPlaylist();
-
+      console.log(trackUris);
       await postPlayList({ userId, playListId, token, trackUris });
     } catch (error) {
       console.error(`Error`, error);
@@ -126,7 +154,9 @@ function App() {
     }
   };
   const handleDisplay = (setId: Set<string>) => {
-    return [...setId].map((id) => songsMap[id]);
+    return [...setId]
+      .map((id) => songsMap[id])
+      .filter((song) => song !== undefined);
   };
 
   return (
@@ -135,7 +165,7 @@ function App() {
       <div className={styles.main}>
         <SearchBar
           value={inputValue}
-          onChange={handleTextChange}
+          onChange={handleQuaryChange}
           onClick={handleSearch}
         />
         <div className={styles.lay}>

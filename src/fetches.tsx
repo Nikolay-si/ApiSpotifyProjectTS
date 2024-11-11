@@ -62,7 +62,7 @@ export const postPlaylistRequest = async ({
   userId: string;
   token: string;
   playListName: string;
-}): Promise<string> => {
+}) => {
   const data = await request<PlaylistResponse>(
     `https://api.spotify.com/v1/users/${userId}/playlists`,
     {
