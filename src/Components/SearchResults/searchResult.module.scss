@@ -1,19 +1,20 @@
-@import "../../variables.css";
 
-.wrapper {
+@import "../../variables.scss";
+
+.searchResult {
     width: 80%;
     background-color: var(--main-background-color);
     border-radius: 10px;
-    box-shadow: 0px 0px 30px var(--box-shadow-color) ;
+    @include main-box-shadow;
     padding: 30px;
     margin: 0 auto;
-}
-.title {
+
+&__title {
     border-bottom: 2px solid var(--border-color) ;
     margin-bottom: 5px;
-}
+}}
 @media screen and (min-width:720px){
-    .wrapper {
+    .searchResult {
         width: 40%;
     }
 }

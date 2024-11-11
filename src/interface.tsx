@@ -33,3 +33,46 @@ export interface TokenData {
 export interface UserResponse {
   id: string;
 }
+
+export interface PlaylistResponse {
+  id: string;
+}
+
+export interface TrackResponse {
+  id: string;
+  name: string;
+  artists: [{ id: string; name: string }];
+  album: {
+    name: string;
+    images: { url: string }[];
+    release_date: string;
+    id: string;
+  };
+}
+
+export interface TrackState {
+  trackData: TrackResponse | null;
+  loading: boolean;
+  error: string | null;
+}
+
+export interface AlbumData {
+  artists: AlbumArtist[];
+  name: string;
+  id: string;
+}
+
+export interface AlbumArtist {
+  id: string;
+  name: string;
+}
+
+export interface AlbumState {
+  albumData: AlbumData[];
+  loading: boolean;
+  error: string | null;
+}
+
+export interface AlbumResponse {
+  items: AlbumData[];
+}

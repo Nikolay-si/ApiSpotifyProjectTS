@@ -1,11 +1,41 @@
-import { ApiResponse } from "./interface";
-import { UserResponse } from "./interface";
+import {
+  ApiResponse,
+  UserResponse,
+  PlaylistResponse,
+  TrackResponse,
+  AlbumData,
+  AlbumResponse,
+} from "./interface";
+import {} from "./interface";
+
+export const request = async <TResponse,>(
+  url: string,
+  config: RequestInit = {}
+): Promise<TResponse> => {
+  const response = await fetch(url, {
+    ...config,
+    headers: {
+      "Content-Type": "application/json",
+      accept: "application/json",
+      ...config.headers,
+    },
+  });
+
+  const text = await response.text();
+  const res = text ? JSON.parse(text) : {};
+
+  if (response.ok) {
+    return res;
+  }
+
+  throw new Error(`Error ${response.status}: ${res}`);
+};
 
 export const fetchSpotifyTracksData = async (
   inputValue: string,
   token: string
 ): Promise<ApiResponse> => {
-  const response = await fetch(
+  return await request<ApiResponse>(
     `https://api.spotify.com/v1/search?type=track&q=${inputValue}&limit=15`,
     {
       headers: {
@@ -13,31 +43,17 @@ export const fetchSpotifyTracksData = async (
       },
     }
   );
-
-  if (!response.ok) {
-    throw new Error(`Error: ${response.status}`);
-  }
-
-  const data: ApiResponse = await response.json();
-  return data;
 };
+
 export const fetchSpotifyUserData = async (
   token: string
 ): Promise<UserResponse> => {
-  const response = await fetch("https://api.spotify.com/v1/me", {
+  return await request<UserResponse>("https://api.spotify.com/v1/me", {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
-
-  if (!response.ok) {
-    throw new Error(`Error: ${response.status}`);
-  }
-
-  const data: UserResponse = await response.json();
-  return data;
 };
-
 export const postPlaylistRequest = async ({
   userId,
   token,
@@ -46,14 +62,13 @@ export const postPlaylistRequest = async ({
   userId: string;
   token: string;
   playListName: string;
-}): Promise<string> => {
-  const response = await fetch(
+}) => {
+  const data = await request<PlaylistResponse>(
     `https://api.spotify.com/v1/users/${userId}/playlists`,
     {
-      method: `POST`,
+      method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         name: playListName,
@@ -62,12 +77,8 @@ export const postPlaylistRequest = async ({
       }),
     }
   );
-  if (!response.ok) {
-    throw new Error(`Error: ${response.status}`);
-  }
-  const data = await response.json();
-
-  return data.id;
+  const playListId = data.id;
+  return playListId;
 };
 
 export const postPlayList = async ({
@@ -81,13 +92,12 @@ export const postPlayList = async ({
   token: string;
   trackUris: string[];
 }): Promise<void> => {
-  const responsePost = await fetch(
+  await request<void>(
     `https://api.spotify.com/v1/users/${userId}/playlists/${playListId}/tracks`,
     {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         uris: trackUris,
@@ -95,7 +105,34 @@ export const postPlayList = async ({
       }),
     }
   );
-  if (!responsePost.ok) {
-    throw new Error(`Error: ${responsePost.status}`);
-  }
+};
+
+export const fetchSpotifyTrackData = async (
+  trackId: string,
+  token: string
+): Promise<TrackResponse> => {
+  return await request<TrackResponse>(
+    `https://api.spotify.com/v1/tracks/${trackId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+};
+
+export const fetchSpotifyAlbumData = async (
+  albumId: string,
+  token: string
+): Promise<AlbumData[]> => {
+  const response = await request<AlbumResponse>(
+    `https://api.spotify.com/v1/albums/${albumId}/tracks?limit=50`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  const albumData = response.items;
+  return albumData;
 };
