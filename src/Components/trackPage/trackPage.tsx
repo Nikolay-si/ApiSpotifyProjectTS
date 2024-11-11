@@ -23,6 +23,8 @@ export const TrackPage = () => {
     }
   }, []);
 
+  
+
   if (loading) return <Loader />;
   if (error) return <div>Error: {error}</div>;
   if (!trackInfo) return <div>No track info availible</div>;

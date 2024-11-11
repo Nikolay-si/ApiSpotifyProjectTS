@@ -1,20 +1,20 @@
 .header {
-    width:100%;
-    background-color:  var(--main-background-color);
-    text-align: center;
+  width:100%;
+  background-color:  var(--main-background-color);
+  text-align: center;
 
 &__title {
-    cursor: pointer;
+  cursor: pointer;
 }
-  &__image {
-    width: 40px;
-    height: auto;
-  }
-  &__logo {
-    color: var(--logo-text-color);
-    text-shadow: 
-    -2px -2px 0 var(--text-shadow-color),  
-    2px -2px 0 var(--text-shadow-color),
-    -2px 2px 0 var(--text-shadow-color),
-    2px 2px 0 var(--text-shadow-color);
-  }}
+&__image {
+  width: 40px;
+  height: auto;
+}
+&__logo {
+  color: var(--logo-text-color);
+  text-shadow: 
+  -2px -2px 0 var(--text-shadow-color),  
+  2px -2px 0 var(--text-shadow-color),
+  -2px 2px 0 var(--text-shadow-color),
+  2px 2px 0 var(--text-shadow-color);
+}}
